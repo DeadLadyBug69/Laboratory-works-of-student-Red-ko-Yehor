@@ -3,123 +3,93 @@
 #include <math.h>
 #include <conio.h>
 
-//---------Підінтегральна функція 1 / (1.1 + x)^2 ------------
-double integrand_expression(double x)
+//-------Підінтегральна функція-------------
+double f(double x)
  {
     return 1.0 / pow(1.1 + x, 2.0);
 }
 
-//---------------------Метод лівих прямокутників-----------------------
-double num_comput_integral_l_re(double a, double b, unsigned int n)
+//---------Метод лівих прямокутників-----------
+double left_rect(double a, double b, int n)
  {
-    double h = (b - a) / (double)n, s = 0.0;
-    for (unsigned int i = 0; i < n; i++) s += integrand_expression(a + i * h);
+    double h = (b - a) / n, s = 0;
+    for (int i = 0; i < n; i++) s += f(a + i * h);
     return s * h;
 }
 
-//----------------------Метод правих прямокутників------------------------
-double num_comput_integral_r_re(double a, double b, unsigned int n) 
+//----------Метод правих прямокутників------------
+double right_rect(double a, double b, int n)
 {
-    double h = (b - a) / (double)n, s = 0.0;
-    for (unsigned int i = 1; i <= n; i++) s += integrand_expression(a + i * h);
+    double h = (b - a) / n, s = 0;
+    for (int i = 1; i <= n; i++) s += f(a + i * h);
     return s * h;
 }
 
-//--------------------------------Метод трапецій-----------------------------------
-double num_comput_integral_trap(double a, double b, unsigned int n) 
+//--------Метод трапецій--------------
+double trapezoid(double a, double b, int n) 
 {
-    double h = (b - a) / (double)n, s = 0.0;
-    for (unsigned int i = 1; i < n; i++) s += integrand_expression(a + i * h);
-    return (h / 2.0) * (integrand_expression(a) + integrand_expression(b) + 2.0 * s);
+    double h = (b - a) / n, s = 0;
+    for (int i = 1; i < n; i++) s += f(a + i * h);
+    return (h / 2.0) * (f(a) + f(b) + 2.0 * s);
 }
 
-//--------------------------------Метод парабол-------------------------------
-double num_comput_integral_parabolas(double a, double b, unsigned int n) 
+//----------Метод парабол (Сімпсона)------------
+double simpson(double a, double b, int n) 
 {
-    if (n % 2 != 0) n++; //---------парна кількість проміжків
-    double h = (b - a) / (double)n, s_odd = 0.0, s_even = 0.0;
-    for (unsigned int i = 1; i < n; i += 2) s_odd += integrand_expression(a + i * h);
-    for (unsigned int i = 2; i < n; i += 2) s_even += integrand_expression(a + i * h);
-    return (h / 3.0) * (integrand_expression(a) + integrand_expression(b) + 4.0 * s_odd + 2.0 * s_even);
+    if (n % 2 != 0) n++; //------Робимо n парним------------
+    double h = (b - a) / n, s_odd = 0, s_even = 0;
+    for (int i = 1; i < n; i += 2) s_odd += f(a + i * h);
+    for (int i = 2; i < n; i += 2) s_even += f(a + i * h);
+    return (h / 3.0) * (f(a) + f(b) + 4.0 * s_odd + 2.0 * s_even);
 }
+//--------Головна програма--------------
+int main() 
+{
+    double a, b, eps, I1, I2, delta;
+    int n, method;
 
-int main()
- {
-    double left_boundary_a, right_boundary_b, measurement_error;
-    double I1, I2, delta;
-    unsigned int intervals;
-    int var;
+    //---------Введення базових даних--------------------
+    printf("Enter limits [a, b], N(>0), and error (eps):\n> ");
+    scanf("%lf %lf %d %lf", &a, &b, &n, &eps);
 
-    printf("\n\tEnter the left boundary \n X(first)= ");
-    scanf("%lf", &left_boundary_a);
-
-    printf("\n\tEnter the right boundary \n X(last)= ");
-    scanf("%lf", &right_boundary_b);
-
-    do 
-    {
-        printf("\n\tEnter the number of intervals (N>0)\n N= ");
-        scanf("%u", &intervals);
+    //-----------Захист від неправильного вибору методу------------
+    do
+     {
+        printf("\nChoose method (1-Left, 2-Right, 3-Trap, 4-Parab): ");
+        scanf("%d", &method);
     } 
-    while (intervals <= 0);
-
-    printf("\n\tEnter the measurement error of integration\n Measurement error= ");
-    scanf("%lf", &measurement_error);
-
-    do 
-    {
-        printf("\nChoose the method:\n");
-        printf("\t1. By Left Rectangles:\n");
-        printf("\t2. By Right Rectangles:\n");
-        printf("\t3. By Trapetions method:\n");
-        printf("\t4. By Parabola method:\n");
-        printf("(1-4): ");
-        scanf("%d", &var);
-
-        if (var < 1 || var > 4) printf("\n Not right.\n");
-    } 
-    while (var < 1 || var > 4);
+    while (method < 1 || method > 4);
 
     system("cls");
 
-    //--------------------Вказівник на обраний метод------------------------
-    double (*calc_method)(double, double, unsigned int) = NULL;
-
-    switch (var) 
-    {
-        case 1:
-            printf("\n\n\t*Left Rectangles method*\n");
-            calc_method = num_comput_integral_l_re;
-            break;
-        case 2:
-            printf("\n\n\t*Right Rectangles method*\n");
-            calc_method = num_comput_integral_r_re;
-            break;
-        case 3:
-            printf("\n\n\t*Trapetions method*\n");
-            calc_method = num_comput_integral_trap;
-            break;
-        case 4:
-            printf("\n\n\t*Parabola method*\n");
-            calc_method = num_comput_integral_parabolas;
-            break;
+    //------------Вказівник на обрану функцію-----------
+    double (*calc)(double, double, int) = NULL;
+    switch (method)
+     {
+        case 1: calc = left_rect; break;
+        case 2: calc = right_rect; break;
+        case 3: calc = trapezoid; break;
+        case 4: calc = simpson; break;
     }
-    //--------------цикл підбору N за точністю (|I1 - I2| <= eps)-------------
+
+    //-----------Цикл підбору точності (Рунге)-------------
     while (1) 
     {
-        I1 = calc_method(left_boundary_a, right_boundary_b, intervals);
-        I2 = calc_method(left_boundary_a, right_boundary_b, intervals + 2);
+        I1 = calc(a, b, n);
+        I2 = calc(a, b, n + 2);
         delta = fabs(I1 - I2);
-        if (delta <= measurement_error || intervals > 500000) break;
-        intervals += 2;
+        if (delta <= eps || n > 500000) break;
+        n += 2;
     }
 
-    //--------------------Підсумковий вивід-------------------------------
-    printf("\n\ta = %.2lf \n\tb = %.2lf \n\tIntegral = %.8lf \n\tN = %u\n\tDelta = %.8lf",
-           left_boundary_a, right_boundary_b, I2, intervals, delta);
+    //-----------Фінальний вивід---------------
+    printf("RESULTS:\n");
+    printf("a = %.2lf, b = %.2lf\n", a, b);
+    printf("Integral = %.8lf\n", I2);
+    printf("N = %d\n", n + 2);
+    printf("Delta = %.8lf\n", delta);
 
-    printf("\n\nPress any key to finish the program.");
+    printf("\nPress any key to finish the program...");
     getch();
-
     return 0;
 }
