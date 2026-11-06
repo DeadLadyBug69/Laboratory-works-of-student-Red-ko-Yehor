@@ -1,10 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include <time.h> // Бібліотека для заміру часу (clock)
+#include <time.h> 
 #include "funct.h"
 
-// Варіант 13: f(x) = (x-10)^3 * sin((x+10)/100) - 10x + 12
+// f(x) = (x-10)^3 * sin((x+10)/100) - 10x + 12
 double f(double x) {
     return pow(x - 10.0, 3.0) * sin((x + 10.0) / 100.0) - 10.0 * x + 12.0;
 }
@@ -25,7 +25,7 @@ double f_double_prime(double x) {
 // Метод половинного ділення
 void solve_bisection(double a, double b, double eps, int max_iter, int debug) {
     if (f(a) * f(b) >= 0) {
-        printf("\nПомилка: f(a) та f(b) повинні мати різні знаки!\n");
+        printf("\nПомилка: f(a) та f(b) повинні мати різні знаки.\n");
         return;
     }
 
@@ -50,7 +50,7 @@ void solve_bisection(double a, double b, double eps, int max_iter, int debug) {
     clock_t end_time = clock(); // Зупинка таймера
     double time_spent = (double)(end_time - start_time) / CLOCKS_PER_SEC;
 
-    if (iter >= max_iter) printf("\n[УВАГА] Досягнуто ліміт ітерацій!\n");
+    if (iter >= max_iter) printf("\nДосягнуто ліміт ітерацій.\n");
     
     printf("\n--- Результат (Дихотомія) ---\n");
     printf("Корінь x      = %.8f\n", c);
@@ -62,7 +62,7 @@ void solve_bisection(double a, double b, double eps, int max_iter, int debug) {
 // Метод хорд
 void solve_chord(double a, double b, double eps, int max_iter, int debug) {
     if (f(a) * f(b) >= 0) {
-        printf("\nПомилка: f(a) та f(b) повинні мати різні знаки!\n");
+        printf("\nПомилка: f(a) та f(b) повинні мати різні знаки.\n");
         return;
     }
 
@@ -91,7 +91,7 @@ void solve_chord(double a, double b, double eps, int max_iter, int debug) {
     clock_t end_time = clock(); // Зупинка таймера
     double time_spent = (double)(end_time - start_time) / CLOCKS_PER_SEC;
 
-    if (iter >= max_iter) printf("\n[УВАГА] Досягнуто ліміт ітерацій!\n");
+    if (iter >= max_iter) printf("\nДосягнуто ліміт ітерацій.\n");
     
     printf("\n--- Результат (Метод хорд) ---\n");
     printf("Корінь x      = %.8f\n", x_curr);
